@@ -102,6 +102,11 @@ export class SearchService {
     const startPerson = await this.findPersonByName(startName);
     const endPerson = await this.findPersonByName(endName);
 
+    console.log('========================');
+    console.log({ startPerson });
+    console.log({ endPerson });
+    console.log('========================');
+
     // Same person check
     if (startPerson.id === endPerson.id) {
       return {
