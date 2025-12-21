@@ -1,69 +1,17 @@
 version: '3.8'
 
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: capstone-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: Hungns2021
-      MYSQL_DATABASE: sixth_degree
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - capstone-network
-
-  # Backend API (NestJS)
-  backend:
-    build:
-      context: ./be-capstone-project
-      dockerfile: Dockerfile
-    container_name: capstone-backend
-    environment:
-      DB_TYPE: mysql
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USERNAME: root
-      DB_PASSWORD: Hungns2021
-      DB_DATABASE: sixth_degree
-      PORT: 4000
-      NODE_ENV: production
-      TYPEORM_SYNCHRONIZE: "true"
+  app:
+    image: hungns97/be-capstone-project:latest
+    container_name: be-capstone
     ports:
-      - "4000:4000"
-    depends_on:
-      mysql:
-        condition: service_healthy
+      - "80:4000"
+    restart: unless-stopped
+    env_file:
+      - .env
     networks:
-      - capstone-network
-
-  # Frontend (Nuxt.js)
-  frontend:
-    build:
-      context: ./fe-capstone-project
-      dockerfile: Dockerfile
-    container_name: capstone-frontend
-    environment:
-      NUXT_PUBLIC_API_URL: http://localhost:4000
-      PORT: 3000
-      NODE_ENV: production
-    ports:
-      - "3000:3000"
-    depends_on:
-      backend:
-        condition: service_started
-    networks:
-      - capstone-network
-
-volumes:
-  mysql_data:
+      - app-network
 
 networks:
-  capstone-network:
+  app-network:
     driver: bridge
