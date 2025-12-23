@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Person } from '../person/person.entity';
@@ -23,6 +23,7 @@ export class SearchService {
   // In-memory cache for graph data
   private graphCache: Map<number, number[]> | null = null;
   private personCache: Map<number, Person> | null = null;
+  private readonly logger = new Logger(SearchService.name);
 
   constructor(
     @InjectRepository(Person)
@@ -73,6 +74,7 @@ export class SearchService {
    * Find all persons
    */
   async getAllPersons(): Promise<Person[]> {
+    this.logger.log('Get All Persons');
     return this.personRepository.find({
       order: { name: 'ASC' },
     });
@@ -82,6 +84,7 @@ export class SearchService {
    * Find person by name
    */
   async findPersonByName(name: string): Promise<Person> {
+    this.logger.log('Find Person By Name');
     const person = await this.personRepository.findOne({ where: { name } });
     if (!person) {
       throw new NotFoundException(`Person "${name}" not found`);
@@ -96,6 +99,7 @@ export class SearchService {
     startName: string,
     endName: string,
   ): Promise<SearchResult> {
+    this.logger.log('Find Shortest Path');
     const startTime = Date.now();
 
     // Find start and end persons
@@ -206,6 +210,7 @@ export class SearchService {
    * Get graph data for visualization
    */
   async getGraphData() {
+    this.logger.log('Get Graph Data');
     // Ensure cache is loaded
     if (!this.graphCache || !this.personCache) {
       await this.initializeCache();
@@ -239,6 +244,7 @@ export class SearchService {
    * Get statistics about the graph
    */
   async getGraphStats() {
+    this.logger.log('Get Graph Stats');
     const personCount = await this.personRepository.count();
     const connectionCount = await this.connectionRepository.count();
 
