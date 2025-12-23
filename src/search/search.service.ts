@@ -100,8 +100,6 @@ export class SearchService {
     endName: string,
   ): Promise<SearchResult> {
     this.logger.log('Find Shortest Path');
-    this.logger.log(`Start Name: ${startName}`);
-    this.logger.log(`End Name: ${endName}`);
     const startTime = Date.now();
 
     // Find start and end persons
